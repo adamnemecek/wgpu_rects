@@ -165,6 +165,7 @@ impl RectangleBrush {
         device: &wgpu::Device,
         encoder: &mut wgpu::CommandEncoder,
         view: &wgpu::TextureView,
+        camera: &crate::Camera2D,
         size: (f64, f64),
     ) {
         if self.instance_queue.is_empty() {
@@ -186,7 +187,6 @@ impl RectangleBrush {
         let temp_buffer = device
             .create_buffer_mapped(instance_count, wgpu::BufferUsage::COPY_SRC)
             .fill_from_slice(self.instance_queue.as_slice());
-        // self.instance_queue.clear();
 
         encoder.copy_buffer_to_buffer(
             &temp_buffer,

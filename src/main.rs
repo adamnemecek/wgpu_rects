@@ -63,47 +63,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut rectangle_brush = RectangleBrush::new(&device, render_format);
 
-    rectangle_brush.queue_rectangle(10, 20, 20, 20, [0.5, 0.5, 0.5, 1.0]);
+    rectangle_brush.queue_rectangle(300, 300, 20, 20, [0.5, 0.5, 0.5, 1.0]);
+    rectangle_brush.queue_rectangle(350, 300, 20, 20, [0.5, 0.5, 0.5, 1.0]);
     // window.request_redraw();
     // window.set_cursor_icon(CursorIcon::Text);
 
-    // let mut editor = Editor::new(size, file_name);
     let mut last_frame = std::time::Instant::now();
 
     let mut modifier_pressed = false;
     let mut cursor_position: PhysicalPosition<i32> = PhysicalPosition::new(0, 0);
+
+    let mut cam = crate::Camera2D::new((size.width as f32, size.height as f32));
 
     event_loop.run(move |event, _, control_flow| match event {
         Event::WindowEvent {
             event: WindowEvent::CloseRequested,
             ..
         } => *control_flow = ControlFlow::Exit,
-
-        Event::WindowEvent {
-            event: WindowEvent::KeyboardInput { input, .. },
-            ..
-        } => {
-            if input.virtual_keycode == Some(VirtualKeyCode::LControl) {
-                modifier_pressed = input.state == ElementState::Pressed;
-            }
-            match (input.virtual_keycode, input.modifiers) {
-                // Quit
-                (Some(VirtualKeyCode::Q), ModifiersState::CTRL) => {
-                    *control_flow = ControlFlow::Exit
-                }
-
-                // Save
-                (Some(VirtualKeyCode::S), ModifiersState::CTRL) => {
-                    // editor.save();
-                }
-
-                _ => {
-                    // editor.handle_keyboard_input(input);
-                    // TODO: Only redraw is something has changed
-                    window.request_redraw();
-                }
-            }
-        }
 
         // Event::WindowEvent {
         //     event: WindowEvent::ReceivedCharacter(input),
@@ -115,7 +91,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         //         window.request_redraw();
         //     }
         // }
-
         Event::WindowEvent {
             event: WindowEvent::CursorMoved { position, .. },
             ..
@@ -129,22 +104,30 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             event: WindowEvent::MouseInput { state, button, .. },
             ..
         } => {
-            // editor.handle_mouse_input(button, state, cursor_position);
             window.request_redraw();
         }
 
         Event::WindowEvent {
-            event:
-                WindowEvent::MouseWheel {
-                    delta: MouseScrollDelta::PixelDelta(delta),
-                    ..
-                },
+            event: WindowEvent::MouseWheel { delta, .. },
             ..
         } => {
-            // Fix scroll direction
-            // TODO: query user preferences
-            // editor.scroll(-delta.y as f32);
-            window.request_redraw();
+            match delta {
+                MouseScrollDelta::PixelDelta(delta) => {
+                    // Fix scroll direction
+                    // TODO: query user preferences
+                    // editor.scroll(-delta.y as f32);
+                    println!("mouse wheel {:}:{:}", delta.x, delta.y);
+                    let screen_point = crate::ScreenPoint {
+                        x: cursor_position.x as f32,
+                        y: cursor_position.y as f32,
+                    };
+                    cam.zoom_to(screen_point, 0.1);
+                    window.request_redraw();
+                }
+                MouseScrollDelta::LineDelta(dx, dy) => {
+                    window.request_redraw();
+                }
+            }
         }
 
         Event::WindowEvent {
@@ -152,7 +135,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             ..
         } => {
             size = new_size;
-            // editor.update_size(size);
 
             swap_chain = device.create_swap_chain(
                 &surface,
@@ -194,32 +176,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 depth_stencil_attachment: None,
             });
 
-            // editor.draw(size, &mut glyph_brush, &mut rectangle_brush);
-
             rectangle_brush.draw(
                 &device,
                 &mut encoder,
                 &frame.view,
+                &cam,
                 (size.width as f64, size.height as f64),
             );
-
-            // glyph_brush.queue(Section {
-            //     text: &format!("{:.2} fps", fps),
-            //     screen_position: (size.width as f32 - 200.0, 5.0),
-            //     scale: Scale::uniform(40.0),
-            //     color: [1.0, 1.0, 1.0, 1.0],
-            //     ..Section::default()
-            // });
-
-            // glyph_brush
-            //     .draw_queued(
-            //         &mut device,
-            //         &mut encoder,
-            //         &frame.view,
-            //         size.width,
-            //         size.height,
-            //     )
-            //     .expect("Failed to draw queued text.");
 
             queue.submit(&[encoder.finish()]);
         }

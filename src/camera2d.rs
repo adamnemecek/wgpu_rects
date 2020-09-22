@@ -1,4 +1,3 @@
-
 use nalgebra as na;
 
 pub type Point2 = na::Point2<f32>;
@@ -7,7 +6,6 @@ pub type Point4 = na::Point4<f32>;
 pub type Mat3 = na::Matrix3<f32>;
 pub type Mat4 = na::Matrix4<f32>;
 pub type Vec3 = na::Vector3<f32>;
-
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct ScreenPoint {
@@ -107,14 +105,14 @@ fn aspect_ratio_transform(inner_size: (f32, f32), outer_size: (f32, f32)) -> Mat
 // inner size is the size of the image
 // outer size is the size of the view
 
-pub struct Camera2D2 {
+pub struct Camera2D {
     // view size
     outer_size: (f32, f32),
     transform: Mat4,
     scale: f32,
 }
 
-impl Camera2D2 {
+impl Camera2D {
     pub fn new(outer_size: (f32, f32)) -> Self {
         Self {
             outer_size,
@@ -159,7 +157,7 @@ impl Camera2D2 {
         self.transform = self.transform.append_translation(&shift);
     }
 
-    pub fn transform(&self, inner_size: (f32, f32)) -> Mat4 {
+    pub fn transform(&self) -> Mat4 {
         self.transform * crate::ortho(self.outer_size.0, self.outer_size.1)
     }
 }
