@@ -20,8 +20,8 @@ use winit::{
 };
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut args = std::env::args();
-    let file_name = args.nth(1).expect("Must specify a file to open");
+    // let mut args = std::env::args();
+    // let file_name = args.nth(1).expect("Must specify a file to open");
 
     let event_loop = EventLoop::new();
     let window = WindowBuilder::new()
@@ -36,7 +36,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     })
     .expect("Failed to create adapter");
 
-    let (mut device, mut queue) = adapter.request_device(&wgpu::DeviceDescriptor {
+    let (device, mut queue) = adapter.request_device(&wgpu::DeviceDescriptor {
         extensions: wgpu::Extensions {
             anisotropic_filtering: false,
         },
@@ -58,17 +58,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
 
     // TODO: Dynamically load fonts or something?
-    let inconsolata: &[u8] = include_bytes!("../res/UbuntuMono-R.ttf");
-    // /Users/connor/Library/Fonts/InconsolataGo-Regular.ttf");
-    let mut glyph_brush =
-        GlyphBrushBuilder::using_font_bytes(inconsolata).build(&mut device, render_format);
+    // let inconsolata: &[u8] = include_bytes!("../res/UbuntuMono-R.ttf");
+    // // /Users/connor/Library/Fonts/InconsolataGo-Regular.ttf");
+    // let mut glyph_brush =
+    //     GlyphBrushBuilder::using_font_bytes(inconsolata).build(&mut device, render_format);
 
     let mut rectangle_brush = RectangleBrush::new(&device, render_format);
 
-    window.request_redraw();
-    window.set_cursor_icon(CursorIcon::Text);
+    rectangle_brush.queue_rectangle(10, 20, 20, 20, [0.5, 0.5, 0.5, 1.0]);
+    // window.request_redraw();
+    // window.set_cursor_icon(CursorIcon::Text);
 
-    let mut editor = Editor::new(size, file_name);
+    // let mut editor = Editor::new(size, file_name);
     let mut last_frame = std::time::Instant::now();
 
     let mut modifier_pressed = false;
@@ -95,11 +96,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
                 // Save
                 (Some(VirtualKeyCode::S), ModifiersState::CTRL) => {
-                    editor.save();
+                    // editor.save();
                 }
 
                 _ => {
-                    editor.handle_keyboard_input(input);
+                    // editor.handle_keyboard_input(input);
                     // TODO: Only redraw is something has changed
                     window.request_redraw();
                 }
@@ -111,7 +112,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             ..
         } => {
             if !modifier_pressed {
-                editor.handle_char_input(input);
+                // editor.handle_char_input(input);
                 // TODO: Only redraw is something has changed
                 window.request_redraw();
             }
@@ -122,7 +123,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             ..
         } => {
             cursor_position = position;
-            editor.handle_mouse_move(cursor_position);
+            // editor.handle_mouse_move(cursor_position);
             window.request_redraw();
         }
 
@@ -130,7 +131,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             event: WindowEvent::MouseInput { state, button, .. },
             ..
         } => {
-            editor.handle_mouse_input(button, state, cursor_position);
+            // editor.handle_mouse_input(button, state, cursor_position);
             window.request_redraw();
         }
 
@@ -144,7 +145,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         } => {
             // Fix scroll direction
             // TODO: query user preferences
-            editor.scroll(-delta.y as f32);
+            // editor.scroll(-delta.y as f32);
             window.request_redraw();
         }
 
@@ -153,7 +154,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             ..
         } => {
             size = new_size;
-            editor.update_size(size);
+            // editor.update_size(size);
 
             swap_chain = device.create_swap_chain(
                 &surface,
@@ -195,7 +196,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 depth_stencil_attachment: None,
             });
 
-            editor.draw(size, &mut glyph_brush, &mut rectangle_brush);
+            // editor.draw(size, &mut glyph_brush, &mut rectangle_brush);
 
             rectangle_brush.draw(
                 &device,
@@ -204,23 +205,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 (size.width as f64, size.height as f64),
             );
 
-            glyph_brush.queue(Section {
-                text: &format!("{:.2} fps", fps),
-                screen_position: (size.width as f32 - 200.0, 5.0),
-                scale: Scale::uniform(40.0),
-                color: [1.0, 1.0, 1.0, 1.0],
-                ..Section::default()
-            });
+            // glyph_brush.queue(Section {
+            //     text: &format!("{:.2} fps", fps),
+            //     screen_position: (size.width as f32 - 200.0, 5.0),
+            //     scale: Scale::uniform(40.0),
+            //     color: [1.0, 1.0, 1.0, 1.0],
+            //     ..Section::default()
+            // });
 
-            glyph_brush
-                .draw_queued(
-                    &mut device,
-                    &mut encoder,
-                    &frame.view,
-                    size.width,
-                    size.height,
-                )
-                .expect("Failed to draw queued text.");
+            // glyph_brush
+            //     .draw_queued(
+            //         &mut device,
+            //         &mut encoder,
+            //         &frame.view,
+            //         size.width,
+            //         size.height,
+            //     )
+            //     .expect("Failed to draw queued text.");
 
             queue.submit(&[encoder.finish()]);
         }
