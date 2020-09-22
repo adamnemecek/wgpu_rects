@@ -4,14 +4,12 @@
 // * Support mouse up/down/move in editor/buffer
 // * Add layout functionality
 
-mod buffer;
-mod editor;
 mod rectangle_brush;
+use rectangle_brush::*;
 
-use editor::Editor;
-use rectangle_brush::RectangleBrush;
+mod camera2d;
+use camera2d::*;
 
-use wgpu_glyph::{GlyphBrushBuilder, Scale, Section};
 use winit::{
     dpi::PhysicalPosition,
     event::{ElementState, Event, ModifiersState, MouseScrollDelta, VirtualKeyCode, WindowEvent},
@@ -107,16 +105,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
 
-        Event::WindowEvent {
-            event: WindowEvent::ReceivedCharacter(input),
-            ..
-        } => {
-            if !modifier_pressed {
-                // editor.handle_char_input(input);
-                // TODO: Only redraw is something has changed
-                window.request_redraw();
-            }
-        }
+        // Event::WindowEvent {
+        //     event: WindowEvent::ReceivedCharacter(input),
+        //     ..
+        // } => {
+        //     if !modifier_pressed {
+        //         // editor.handle_char_input(input);
+        //         // TODO: Only redraw is something has changed
+        //         window.request_redraw();
+        //     }
+        // }
 
         Event::WindowEvent {
             event: WindowEvent::CursorMoved { position, .. },
