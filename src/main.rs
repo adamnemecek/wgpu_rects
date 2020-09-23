@@ -74,7 +74,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut cursor_position: PhysicalPosition<i32> = PhysicalPosition::new(0, 0);
 
     let mut cam = crate::Camera2D::new((size.width as f32, size.height as f32));
-    let transform = 5.0 * nalgebra::Matrix4::<f32>::identity();
+
+    let transform = nalgebra::Matrix4::<f32>::identity().append_scaling(2.0);
 
     event_loop.run(move |event, _, control_flow| match event {
         Event::WindowEvent {
@@ -125,7 +126,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     cam.zoom_to(screen_point, 0.1);
                     window.request_redraw();
                 }
-                MouseScrollDelta::LineDelta(dx, dy) => {
+                MouseScrollDelta::LineDelta(_, dy) => {
+                    let screen_point = crate::ScreenPoint {
+                        x: cursor_position.x as f32,
+                        y: cursor_position.y as f32,
+                    };
+                    cam.zoom_to(screen_point, dy);
                     window.request_redraw();
                 }
             }

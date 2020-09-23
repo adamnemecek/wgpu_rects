@@ -36,29 +36,6 @@ fn orthographic_projection(width: f64, height: f64) -> [f32; 16] {
     ]
 }
 
-fn orthographic_projection2(width: f64, height: f64) -> nalgebra::Matrix4<f32> {
-    // #[cfg_attr(rustfmt, rustfmt_skip)]
-    nalgebra::Matrix4::new(
-        2.0 / width as f32,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        2.0 / height as f32,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        1.0,
-        0.0,
-        -1.0,
-        -1.0,
-        0.0,
-        1.0,
-    )
-    .transpose()
-}
-
 impl RectangleBrush {
     pub fn new(device: &wgpu::Device, format: wgpu::TextureFormat) -> Self {
         let vs_bytes = include_bytes!("shaders/rectangle.vert.spv");
@@ -222,24 +199,17 @@ impl RectangleBrush {
             (std::mem::size_of::<RectInstance>() * instance_count) as u64,
         );
 
-        let ortho = orthographic_projection2(size.0, size.1);
-        let tform = transform * ortho ;
-        // let ortho = crate::ortho(size.0 as _, size.1 as _);
-        println!("tform: {:?}", tform);
+        let ortho = crate::orthographic_projection2(size.0 as _, size.1 as _);
+        let tform = transform * ortho;
+
+        // println!("tform: {:?}", tform);
         // let tform = ortho;// * transform;
-        // let fo
-        // ortho: Matrix { data: [0.0025, 0.0, 0.0, 0.0,
-        //                         0.0, 0.0033333334, 0.0, 0.0,
-        //                         0.0, 0.0, 0.01010101, 0.0,
-        //                         -1.0, -1.0, -0.01010101, 1.0] }
-        // ortho: [0.0025, 0.0, 0.0, 0.0,
-        //         0.0, 0.0033333334, 0.0, 0.0,
-        //         0.0, 0.0, 1.0, 0.0,
-        //         -1.0, -1.0, 0.0, 1.0]
-        // if self.current_transform != ortho_proj {
+
+        let t = camera.transform();
+        println!("t: {:?}", t);
         let temp_buffer = device
             .create_buffer_mapped(16, wgpu::BufferUsage::COPY_SRC)
-            .fill_from_slice(tform.as_slice());
+            .fill_from_slice(t.as_slice());
         // .fill_from_slice(&ortho[..]);
 
         encoder.copy_buffer_to_buffer(&temp_buffer, 0, &self.transform_buffer, 0, 16 * 4);

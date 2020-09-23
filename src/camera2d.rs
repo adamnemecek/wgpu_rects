@@ -38,6 +38,29 @@ pub fn ortho(w: f32, h: f32) -> na::Matrix4<f32> {
     ortho_lh_zo(0.0, w, 0.0, h, 1.0, 100.0)
 }
 
+pub fn orthographic_projection2(width: f32, height: f32) -> nalgebra::Matrix4<f32> {
+    // #[cfg_attr(rustfmt, rustfmt_skip)]
+    nalgebra::Matrix4::new(
+        2.0 / width as f32,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        2.0 / height as f32,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        -1.0,
+        -1.0,
+        0.0,
+        1.0,
+    )
+    .transpose()
+}
+
 // func textureTranslation(from viewTranslation: CGPoint,
 //     in textureView: MTKView) -> SIMD2<Float> {
 //     let textureViewSize: SIMD2<Float> = .init(.init(textureView.frame.width),
@@ -158,6 +181,6 @@ impl Camera2D {
     }
 
     pub fn transform(&self) -> Mat4 {
-        self.transform * crate::ortho(self.outer_size.0, self.outer_size.1)
+        self.transform * orthographic_projection2(self.outer_size.0, self.outer_size.1)
     }
 }
