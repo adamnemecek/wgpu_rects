@@ -206,7 +206,7 @@ impl RectangleBrush {
         // let tform = ortho;// * transform;
 
         let t = camera.transform();
-        println!("t: {:?}", t);
+        // println!("t: {:?}", t);
         let temp_buffer = device
             .create_buffer_mapped(16, wgpu::BufferUsage::COPY_SRC)
             .fill_from_slice(t.as_slice());

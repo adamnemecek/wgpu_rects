@@ -123,7 +123,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         x: cursor_position.x as f32,
                         y: cursor_position.y as f32,
                     };
-                    cam.zoom_to(screen_point, 0.1);
+                    cam.zoom_to(screen_point, (delta.y / 100.0) as f32);
                     window.request_redraw();
                 }
                 MouseScrollDelta::LineDelta(_, dy) => {
@@ -131,6 +131,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         x: cursor_position.x as f32,
                         y: cursor_position.y as f32,
                     };
+                    println!("dy: {:?}", dy);
                     cam.zoom_to(screen_point, dy);
                     window.request_redraw();
                 }

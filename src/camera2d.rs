@@ -109,7 +109,15 @@ fn texture_point(
 
     let point = Point4::new(point.0, point.1, 0.0, 1.0);
 
-    let res = transform.try_inverse().unwrap() * point;
+    let res;
+    if let Some(inv) = transform.try_inverse() {
+        res = inv * point;
+    }
+    else {
+        println!("no inverse for {:?}", transform);
+        todo!();
+    }
+    // let res = transform.try_inverse().unwrap() * point;
     (res.x, res.y)
 }
 
