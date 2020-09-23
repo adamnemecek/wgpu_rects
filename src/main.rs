@@ -74,6 +74,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut cursor_position: PhysicalPosition<i32> = PhysicalPosition::new(0, 0);
 
     let mut cam = crate::Camera2D::new((size.width as f32, size.height as f32));
+    let transform = nalgebra::Matrix4::<f32>::identity();
 
     event_loop.run(move |event, _, control_flow| match event {
         Event::WindowEvent {
@@ -181,6 +182,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 &mut encoder,
                 &frame.view,
                 &cam,
+                &transform,
                 (size.width as f64, size.height as f64),
             );
 

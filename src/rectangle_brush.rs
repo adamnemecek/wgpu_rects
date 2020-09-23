@@ -14,7 +14,8 @@ pub struct RectangleBrush {
     transform_buffer: wgpu::Buffer,
     instance_queue: Vec<RectInstance>,
     rect_capacity: usize,
-    current_transform: [f32; 16],
+    // current_transform: [f32; 16],
+    // current_transform: nalgebra::Matrix4<f32>,
 }
 
 #[rustfmt::skip]
@@ -145,7 +146,8 @@ impl RectangleBrush {
             bind_group,
             transform_buffer,
             instance_buffer,
-            current_transform: IDENTITY_MATRIX,
+            // current_transform: IDENTITY_MATRIX,
+            // current_transform: nalgebra::Matrix4::<f32>::identity(),
             instance_queue: vec![],
             rect_capacity: DEFAULT_MAX_RECTS,
         }
@@ -166,6 +168,7 @@ impl RectangleBrush {
         encoder: &mut wgpu::CommandEncoder,
         view: &wgpu::TextureView,
         camera: &crate::Camera2D,
+        transform: &nalgebra::Matrix4<f32>,
         size: (f64, f64),
     ) {
         if self.instance_queue.is_empty() {
@@ -196,16 +199,20 @@ impl RectangleBrush {
             (std::mem::size_of::<RectInstance>() * instance_count) as u64,
         );
 
-        let ortho_proj = orthographic_projection(size.0, size.1);
-        if self.current_transform != ortho_proj {
-            let temp_buffer = device
-                .create_buffer_mapped(16, wgpu::BufferUsage::COPY_SRC)
-                .fill_from_slice(&ortho_proj[..]);
+        let ortho = orthographic_projection(size.0, size.1);
+        // let ortho = crate::ortho(size.0 as _, size.1 as _);
+        // let tform = ortho;// * transform;
+        // let fo
+        // if self.current_transform != ortho_proj {
+        let temp_buffer = device
+            .create_buffer_mapped(16, wgpu::BufferUsage::COPY_SRC)
+            // .fill_from_slice(ortho.transpose().as_slice());
+            .fill_from_slice(&ortho[..]);
 
-            encoder.copy_buffer_to_buffer(&temp_buffer, 0, &self.transform_buffer, 0, 16 * 4);
+        encoder.copy_buffer_to_buffer(&temp_buffer, 0, &self.transform_buffer, 0, 16 * 4);
 
-            self.current_transform = ortho_proj;
-        }
+        // self.current_transform = tform;
+        // }
 
         // We don't really need new render passes for this. Let's maybe pass this in the draw call?
         // This was modelled after wgpu_glyph which wants its own render pass, but there really
