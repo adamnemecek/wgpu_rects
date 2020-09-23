@@ -71,7 +71,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut last_frame = std::time::Instant::now();
 
     let mut modifier_pressed = false;
-    let mut cursor_position: PhysicalPosition<i32> = PhysicalPosition::new(0, 0);
+    let mut cursor_position: PhysicalPosition<f64> = PhysicalPosition::new(0.0, 0.0);
 
     let mut cam = crate::Camera2D::new((size.width as f32, size.height as f32));
 
