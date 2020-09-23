@@ -223,8 +223,9 @@ impl RectangleBrush {
         );
 
         let ortho = orthographic_projection2(size.0, size.1);
+        let tform = transform * ortho ;
         // let ortho = crate::ortho(size.0 as _, size.1 as _);
-        println!("ortho: {:?}", ortho);
+        println!("tform: {:?}", tform);
         // let tform = ortho;// * transform;
         // let fo
         // ortho: Matrix { data: [0.0025, 0.0, 0.0, 0.0,
@@ -238,7 +239,7 @@ impl RectangleBrush {
         // if self.current_transform != ortho_proj {
         let temp_buffer = device
             .create_buffer_mapped(16, wgpu::BufferUsage::COPY_SRC)
-            .fill_from_slice(ortho.as_slice());
+            .fill_from_slice(tform.as_slice());
         // .fill_from_slice(&ortho[..]);
 
         encoder.copy_buffer_to_buffer(&temp_buffer, 0, &self.transform_buffer, 0, 16 * 4);
